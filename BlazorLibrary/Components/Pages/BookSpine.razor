@@ -1,0 +1,11 @@
+﻿<div class="book-card" style="background-color: @Data.BackgroundColor;">
+    <div class="book-content">
+        <h3>@Data.Title</h3>
+        <p>@Data.Author</p>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public BookData Data { get; set; } = new();
+}
