@@ -1,11 +1,20 @@
-﻿namespace BlazorLibrary
+﻿using System.Runtime.Serialization;
+
+namespace BlazorLibrary
 {
-    public class BookData
+    [DataContract]
+    public class BookData : IExtensibleDataObject
     {
+        [DataMember]
         public string Title { get; set; } = "Unknown Title";
+        [DataMember]
         public string Author { get; set; } = "Unknown Author";
+        [DataMember]
         public bool IsRead { get; set; }
+        [DataMember]
         public string? BackgroundColor { get; set; } // Optional: Specify a custom background color
+        
+        public ExtensionDataObject? ExtensionData { get; set; }
 
         public void GenerateRandomBackgroundColor()
         {

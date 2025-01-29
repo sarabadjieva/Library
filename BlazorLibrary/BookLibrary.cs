@@ -1,4 +1,4 @@
-﻿using Utilities.SaveSystem;
+﻿using Utilities;
 
 namespace BlazorLibrary
 {
@@ -7,18 +7,17 @@ namespace BlazorLibrary
         private static BookLibrary? instance;
         public static BookLibrary Instance => instance ??= new BookLibrary();
 
-        public SaveDataCollection<BookData> books;
-        private readonly SaveSystem<SaveDataCollection<BookData>> saveSystem = new();
+        public List<BookData> books;
 
         public BookLibrary()
         {
-            books = saveSystem.Load() ?? [];
+            books = SaveSystem<BookData>.LoadArray()?.ToList() ?? [];
         }
 
         public void AddBook(BookData book)
         {
             books.Add(book);
-            saveSystem.Save(books);
+            SaveSystem<BookData>.Save([.. books]);
         }
 
         public void RemoveBook(BookData book)
@@ -27,7 +26,7 @@ namespace BlazorLibrary
                 return;
 
             books.Remove(book);
-            saveSystem.Save(books);
+            SaveSystem<BookData>.Save([.. books]);
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿@page "/library"
 @rendermode InteractiveServer
 @using Microsoft.AspNetCore.Components.QuickGrid
-@using Utilities.SaveSystem
+@using Utilities
 @using BookStacks = List<List<BookData>>
 @using Shelves = List<List<List<BookData>>>>
 
@@ -9,8 +9,8 @@
 
 <h3>My Library</h3>
 
-<input @bind="newBook"/>
-<input @bind="newAuthor"/>
+<input @bind="newTitle" />
+<input @bind="newAuthor" />
 <button @onclick="AddBook">Add Book</button>
 <hr/>
 <button @onclick="RemoveBook">Remove Selected Book</button>
@@ -25,9 +25,9 @@
                     @foreach (var book in stack)
                     {
                         <button
-                            onclick="@(() => SelectBook(book))"
-                            class="book-spine"
-                            style="background-color: @book.BackgroundColor">
+                        onclick="@(() => SelectBook(book))"
+                        class="book-spine"
+                        style="background-color: @book.BackgroundColor">
                             @book.Title - @book.Author
                         </button>
                     }
@@ -39,7 +39,7 @@
 
 @code {
     BookData? selectedBook;
-    string? newBook;
+    string? newTitle;
     string? newAuthor;
 
     private const int MaxBooksPerStack = 3;
@@ -48,20 +48,30 @@
 
     public async void AddBook()
     {
-        if (string.IsNullOrWhiteSpace(newBook)
-        || string.IsNullOrWhiteSpace(newAuthor))
+        if (!ValidateBook())
             return;
 
         // Create book data with bew values
-        BookData newBookData = new() { Title = newBook, Author = newAuthor };
+        BookData newBookData = new() { Title = newTitle, Author = newAuthor };
         newBookData.GenerateRandomBackgroundColor();
         BookLibrary.Instance.AddBook(newBookData);
 
         // Reset UI data
-        newBook = string.Empty;
+        newTitle = string.Empty;
         newAuthor = string.Empty;
 
         await OrganizeBooks();
+    }
+
+    private bool ValidateBook()
+    {
+        if (string.IsNullOrWhiteSpace(newTitle) || string.IsNullOrWhiteSpace(newAuthor))
+            return false;
+
+        if (BookLibrary.Instance.books.Any(bd => bd.Title == newTitle && bd.Author == newAuthor))
+            return false;
+
+        return true;
     }
 
     public async void RemoveBook()
