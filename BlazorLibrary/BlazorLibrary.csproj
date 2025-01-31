@@ -6,10 +6,6 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.QuickGrid" Version="9.0.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="Utilities">
-      <HintPath>..\..\Utilities\Utilities\bin\Debug\net8.0\Utilities.dll</HintPath>
-    </Reference>
+    <PackageReference Include="Utilities" Version="1.0.0" />
   </ItemGroup>
 </Project>
