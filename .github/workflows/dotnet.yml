@@ -20,12 +20,12 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 9.0.x
-    - name: Restore dependencies
-      run: dotnet restore
     - name: Configure NuGet
       run: |
         sed -i 's/%USERNAME%/${{ github.actor }}/' BlazorLibrary/nuget.config
         sed -i 's/%PASSWORD%/${{ secrets.NUGET_API_KEY }}/' BlazorLibrary/nuget.config
+    - name: Restore dependencies
+      run: dotnet restore --configfile BlazorLibrary/nuget.config
     - name: Build
       run: dotnet build --no-restore
     - name: Test
