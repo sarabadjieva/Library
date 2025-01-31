@@ -22,6 +22,10 @@ jobs:
         dotnet-version: 9.0.x
     - name: Restore dependencies
       run: dotnet restore
+    - name: Configure NuGet
+      run: |
+        sed -i 's/%USERNAME%/${{ github.actor }}/' nuget.config
+        sed -i 's/%PASSWORD%/${{ secrets.NUGET_API_KEY }}/' nuget.config
     - name: Build
       run: dotnet build --no-restore
     - name: Test
