@@ -22,14 +22,17 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 9.0.x
-          source-url: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+
+      - name: Authenticate GitHub Packages in NuGet
         env:
           NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Add GitHub Packages as NuGet Source
         run: |
           dotnet nuget remove source github || true
-          dotnet nuget add source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" --name github --username ${{ github.actor }} --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text
+          dotnet nuget add source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" \
+            --name github \
+            --username ${{ github.repository_owner }} \
+            --password $NUGET_AUTH_TOKEN \
+            --store-password-in-clear-text
 
       # Step 4: Restore dependencies (including the NuGet package)
       #- name: Restore dependencies
