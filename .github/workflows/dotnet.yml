@@ -33,7 +33,9 @@ jobs:
             --username ${{ github.repository_owner }} \
             --password $NUGET_AUTH_TOKEN \
             --store-password-in-clear-text
-
+  
+      - name: Clear NuGet Cache
+        run: dotnet nuget locals all --clear
       # Step 4: Restore dependencies (including the NuGet package)
       #- name: Restore dependencies
       #  run: dotnet restore
