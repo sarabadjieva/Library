@@ -23,7 +23,7 @@ jobs:
     - name: Configure NuGet
       run: |
         sed -i 's/%USERNAME%/${{ github.actor }}/' BlazorLibrary/nuget.config
-        sed -i 's/%PASSWORD%/${{ secrets.NUGET_API_KEY }}/' BlazorLibrary/nuget.config
+        sed -i 's/%PASSWORD%/${{ secrets.GITHUB_TOKEN }}/' BlazorLibrary/nuget.config
     - name: Restore dependencies
       run: dotnet restore BlazorLibrary/BlazorLibrary.csproj --configfile BlazorLibrary/nuget.config
     - name: Build
