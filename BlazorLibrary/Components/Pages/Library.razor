@@ -2,8 +2,9 @@
 @rendermode InteractiveServer
 @using Microsoft.AspNetCore.Components.QuickGrid
 @using Utilities
-@using BookStacks = List<List<BookData>>
-@using Shelves = List<List<List<BookData>>>>
+@using Models
+@using BookStacks = List<List<Models.BookData>>
+@using Shelves = List<List<List<Models.BookData>>>>
 
 <PageTitle>Library</PageTitle>
 
@@ -25,9 +26,9 @@
                     @foreach (var book in stack)
                     {
                         <button
-                        onclick="@(() => SelectBook(book))"
+                        @onclick="@(() => SelectBook(book))"
                         class="book-spine"
-                        style="background-color: @book.BackgroundColor">
+                        style="background-color: @(selectedBook == book ? highlighColor : book.BackgroundColor)">
                             @book.Title - @book.Author
                         </button>
                     }
@@ -41,6 +42,8 @@
     BookData? selectedBook;
     string? newTitle;
     string? newAuthor;
+
+    string highlighColor = "rgb(0,0,0)";
 
     private const int MaxBooksPerStack = 3;
     private int StackWidth = 200; // Approximate width of each stack including margin
@@ -83,7 +86,7 @@
         await OrganizeBooks();
     }
 
-    public void SelectBook(BookData data) => selectedBook = data;
+    public void SelectBook(BookData data) => selectedBook = selectedBook == data ? null : selectedBook;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

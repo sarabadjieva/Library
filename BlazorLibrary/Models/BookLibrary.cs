@@ -1,6 +1,6 @@
 ﻿using Utilities;
 
-namespace BlazorLibrary
+namespace BlazorLibrary.Models
 {
     public class BookLibrary
     {

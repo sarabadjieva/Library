@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace BlazorLibrary
+namespace BlazorLibrary.Models
 {
     [DataContract]
     public class BookData : IExtensibleDataObject
@@ -12,8 +12,8 @@ namespace BlazorLibrary
         [DataMember]
         public bool IsRead { get; set; }
         [DataMember]
-        public string? BackgroundColor { get; set; } // Optional: Specify a custom background color
-        
+        public string? BackgroundColor { get; set; }
+
         public ExtensionDataObject? ExtensionData { get; set; }
 
         public void GenerateRandomBackgroundColor()
@@ -50,6 +50,11 @@ namespace BlazorLibrary
             }
 
             BackgroundColor = $"rgb({red}, {green}, {blue})";
+        }
+
+        public void Highlight(bool highligh)
+        {
+
         }
     }
 }
