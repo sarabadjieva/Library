@@ -40,7 +40,7 @@ jobs:
 
       # Step 4: Restore dependencies (Debug Mode)
       - name: Restore Dependencies (Debug Mode)
-        run: dotnet restore --verbosity detailed
+        run: dotnet restore --configfile --verbosity detailed
   
       # Step 5: Build the project
       - name: Build project
