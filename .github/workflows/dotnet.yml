@@ -1,32 +1,40 @@
-# This workflow will build a .NET project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
-
-name: .NET
+name: Build and Test App with NuGet Package
 
 on:
   push:
-    branches: [ "master" ]
+    branches:
+      - master  # Runs on push to master
   pull_request:
-    branches: [ "master" ]
+    branches:
+      - master  # Runs on PR to master
 
 jobs:
-  build:
-
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 9.0.x
-    - name: Configure NuGet
-      run: |
-        sed -i 's/%USERNAME%/${{ github.actor }}/' BlazorLibrary/nuget.config
-        sed -i 's/%PASSWORD%/${{ secrets.GITHUB_TOKEN }}/' BlazorLibrary/nuget.config
-    - name: Restore dependencies
-      run: dotnet restore BlazorLibrary/BlazorLibrary.csproj --configfile BlazorLibrary/nuget.config
-    - name: Build
-      run: dotnet build --no-restore
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
+      # Step 1: Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Setup .NET SDK (9.0.x)
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      # Step 3: Add GitHub NuGet Source (to access private package)
+      - name: Add GitHub NuGet Source
+        run: dotnet nuget add source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" --name github --username ${{ github.actor }} --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text
+
+      # Step 4: Restore dependencies (including the NuGet package)
+      - name: Restore dependencies
+        run: dotnet restore
+
+      # Step 5: Build the project
+      - name: Build project
+        run: dotnet build --configuration Release --no-restore
+
+      # Step 6: Run tests (if applicable)
+      - name: Run tests
+        run: dotnet test --configuration Release --no-build --verbosity normal
