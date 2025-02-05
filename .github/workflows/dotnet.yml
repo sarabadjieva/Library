@@ -1,54 +1,34 @@
-name: Build and Test App with NuGet Package
+name: Build and Test
 
 on:
   push:
     branches:
-      - master  # Runs on push to master
+      - main
   pull_request:
     branches:
-      - master  # Runs on PR to master
+      - main
 
 jobs:
-  build-and-test:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout repository
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      # Step 2: Setup .NET SDK (9.0.x)
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 9.0.x
+    - name: Set up .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '9.0.x'
 
-      - name: Install .NET Workloads
-        run: dotnet workload install
-        
-      - name: Authenticate GitHub Packages in NuGet
-        env:
-          NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          dotnet nuget remove source github || true
-          dotnet nuget add source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" \
-            --name github \
-            --username ${{ github.repository_owner }} \
-            --password $NUGET_AUTH_TOKEN \
-            --store-password-in-clear-text
-            
-      # Step 4: Restore dependencies (including the NuGet package)
-      #- name: Restore dependencies
-      #  run: dotnet restore
+    - name: Authenticate to GitHub Package Registry
+      run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" > ~/.npmrc
 
-      # Step 4: Restore dependencies (Debug Mode)
-      - name: Restore Dependencies (Debug Mode)
-        run: dotnet restore --configfile BlazorLibrary/nuget.config --verbosity detailed
-  
-      # Step 5: Build the project
-      - name: Build project
-        run: dotnet build --configuration Release --no-restore
+    - name: Restore dependencies
+      run: dotnet restore
 
-      # Step 6: Run tests (if applicable)
-      - name: Run tests
-        run: dotnet test --configuration Release --no-build --verbosity normal
+    - name: Build the project
+      run: dotnet build --configuration Release
+
+    - name: Run tests
+      run: dotnet test --no-build --verbosity normal
