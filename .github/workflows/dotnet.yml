@@ -21,8 +21,9 @@ jobs:
       with:
         dotnet-version: '9.0.x'
 
-    - name: Authenticate to GitHub Package Registry
-      run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" > ~/.npmrc
+   # Step 3: Add GitHub Packages NuGet Source
+    - name: Add GitHub NuGet Source
+      run: dotnet nuget add source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" --name github --username ${{ github.actor }} --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text
 
     - name: Restore dependencies
       run: dotnet restore
