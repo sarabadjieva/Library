@@ -1,113 +1,95 @@
 ﻿@page "/library"
 @rendermode InteractiveServer
-@using Microsoft.AspNetCore.Components.QuickGrid
 @using Utilities
-@using BookStacks = List<List<BookData>>
-@using Shelves = List<List<List<BookData>>>>
 
 <PageTitle>Library</PageTitle>
 
-<h3>My Library</h3>
+<h2>My Library</h2>
 
-<input @bind="newTitle" />
-<input @bind="newAuthor" />
-<button @onclick="AddBook">Add Book</button>
-<hr/>
-<button @onclick="RemoveBook">Remove Selected Book</button>
+@if (selectedBook != null)
+{
+    <button class="btn btn-danger remove-btn" @onclick="RemoveBook">Remove Selected Book</button>
+}
 
-<div id="shelf-container" class="shelf-container">
-    @foreach (var shelf in shelves)
+<div class="books-grid">
+    @foreach (var book in BookLibrary.Instance.books)
     {
-        <div class="shelf">
-            @foreach (var stack in shelf)
-            {
-                <div class="book-stack">
-                    @foreach (var book in stack)
-                    {
-                        <button
-                        onclick="@(() => SelectBook(book))"
-                        class="book-spine"
-                        style="background-color: @book.BackgroundColor">
-                            @book.Title - @book.Author
-                        </button>
-                    }
-                </div>
-            }
+        <div class="book-card @(book == selectedBook ? "selected" : "")"
+             @onclick="@(() => SelectBook(book))"
+             title="@($"{book.Title} by {book.Author}")">
+            <div class="book-title">@book.Title</div>
+            <div class="book-author">@book.Author</div>
         </div>
     }
+
+    <!-- Add book card -->
+    <div class="book-card add-book-card" @onclick="() => showAddModal = true" title="Add a new book">
+        <div class="add-icon">+</div>
+        <div>Add Book</div>
+    </div>
 </div>
+
+@if (showAddModal)
+{
+    <div class="modal-backdrop" @onclick="CloseModal"></div>
+    <div class="modal">
+        <h3>Add New Book</h3>
+        <input placeholder="Book Title" @bind="newTitle" />
+        <input placeholder="Author" @bind="newAuthor" />
+        <div class="modal-buttons">
+            <button class="btn btn-primary" @onclick="AddBookAndClose">Add</button>
+            <button class="btn btn-secondary" @onclick="CloseModal">Cancel</button>
+        </div>
+    </div>
+}
 
 @code {
     BookData? selectedBook;
     string? newTitle;
     string? newAuthor;
 
-    private const int MaxBooksPerStack = 3;
-    private int StackWidth = 200; // Approximate width of each stack including margin
-    private int ContainerWidth;
+    private bool showAddModal = false;
 
-    public async void AddBook()
+    public void AddBookAndClose()
     {
-        if (!ValidateBook())
-            return;
+        AddBook();
+        CloseModal();
+    }
 
-        // Create book data with bew values
-        BookData newBookData = new() { Title = newTitle, Author = newAuthor };
-        newBookData.GenerateRandomBackgroundColor();
-        BookLibrary.Instance.AddBook(newBookData);
-
-        // Reset UI data
+    public void CloseModal()
+    {
+        showAddModal = false;
         newTitle = string.Empty;
         newAuthor = string.Empty;
-
-        await OrganizeBooks();
     }
 
-    private bool ValidateBook()
+
+    public void AddBook()
     {
         if (string.IsNullOrWhiteSpace(newTitle) || string.IsNullOrWhiteSpace(newAuthor))
-            return false;
-
-        if (BookLibrary.Instance.books.Any(bd => bd.Title == newTitle && bd.Author == newAuthor))
-            return false;
-
-        return true;
-    }
-
-    public async void RemoveBook()
-    {
-        if (selectedBook == null)
             return;
 
+        if (BookLibrary.Instance.books.Any(b => b.Title == newTitle && b.Author == newAuthor))
+            return;
+
+        var newBook = new BookData { Title = newTitle, Author = newAuthor };
+        newBook.GenerateRandomBackgroundColor();
+        BookLibrary.Instance.AddBook(newBook);
+
+        newTitle = string.Empty;
+        newAuthor = string.Empty;
+        selectedBook = null;
+    }
+
+    public void RemoveBook()
+    {
+        if (selectedBook == null) return;
         BookLibrary.Instance.RemoveBook(selectedBook);
-        await OrganizeBooks();
+        selectedBook = null;
     }
 
-    public void SelectBook(BookData data) => selectedBook = data;
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    public void SelectBook(BookData book)
     {
-        // Measure container and adjust stacks on load
-        if (firstRender)
-            await OrganizeBooks();
+        selectedBook = book;
     }
-
-    BookStacks stacks = new();
-    Shelves shelves = new();
-
-    private async Task OrganizeBooks()
-    {
-        // Measure container width via JavaScript
-        ContainerWidth = await JSRuntime.InvokeAsync<int>("getContainerWidth", "shelf-container");
-        int stacksPerShelf = Math.Max(1, ContainerWidth / StackWidth);
-
-        stacks = BookLibrary.Instance.books.Chunk(MaxBooksPerStack).Select(x => x.ToList()).ToList();
-        shelves = stacks.Chunk(stacksPerShelf).Select(x => x.ToList()).ToList();
-
-        // Distribute books into visible stacks
-        StateHasChanged();
-    }
-
-    [Inject]
-    private IJSRuntime JSRuntime { get; set; }
 }

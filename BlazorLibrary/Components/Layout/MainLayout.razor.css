@@ -1,88 +1,59 @@
+/* Full page layout */
 .page {
-    position: relative;
+    padding-top: 3.5rem; /* equal to navbar height */
     display: flex;
     flex-direction: column;
+    min-height: 100vh;
     background-color: lightgray;
 }
 
-main {
-    flex: 1;
-}
-
-.sidebar {
-    /*background-image: linear-gradient(180deg, rgb(5, 39, 103) 0%, #3a0647 70%);*/
-    background-color: darkslategray;
-}
-
-.top-row {
-    background-color: dimgray;
-    border-bottom: 1px solid #d6d5d5;
-    justify-content: flex-end;
+/* MainLayout.razor.css */
+header {
+    width: 100%;
     height: 3.5rem;
     display: flex;
     align-items: center;
+    justify-content: flex-start;
+    padding: 0; /* remove padding here */
+    border-bottom: none;
+    box-sizing: border-box;
 }
 
-    .top-row ::deep a, .top-row ::deep .btn-link {
+    /* Navbar links */
+    header a,
+    header .btn-link {
+        color: white;
+        margin-right: 1.5rem;
+        text-decoration: none;
         white-space: nowrap;
-        margin-left: 1.5rem;
-        color: midnightblue;
     }
 
-    .top-row ::deep a:hover, .top-row ::deep .btn-link:hover {
-        text-decoration: underline;
-    }
+        header a:hover,
+        header .btn-link:hover {
+            text-decoration: underline;
+        }
 
-    .top-row ::deep a:first-child {
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-@media (max-width: 640.98px) {
-    .top-row {
-        justify-content: space-between;
-    }
-
-    .top-row ::deep a, .top-row ::deep .btn-link {
-        margin-left: 0;
-    }
+/* Main content area */
+.main-content {
+    flex: 1;
+    padding: 2rem;
 }
 
-@media (min-width: 641px) {
-    .page {
-        flex-direction: row;
-    }
-
-    .sidebar {
-        width: 200px;
-        height: 100vh;
-        position: sticky;
-        top: 0;
-    }
-
-    .top-row {
-        position: sticky;
-        top: 0;
-        z-index: 1;
-    }
-
-    .top-row.auth ::deep a:first-child {
-        flex: 1;
-        text-align: right;
-        width: 0;
-    }
-
-    .top-row, article {
-        padding-left: 2rem !important;
-        padding-right: 1.5rem !important;
-    }
+article.content {
+    background-color: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
+/* Hide error UI unless shown explicitly */
 #blazor-error-ui {
     background: lightyellow;
     bottom: 0;
     box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
-    display: none;
+    display: none !important;
     left: 0;
     padding: 0.6rem 1.25rem 0.7rem 1.25rem;
     position: fixed;
@@ -96,3 +67,18 @@ main {
         right: 0.75rem;
         top: 0.5rem;
     }
+
+/* Responsive top navbar for small screens */
+@media (max-width: 640.98px) {
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+        height: auto;
+        padding: 1rem;
+    }
+
+        header a,
+        header .btn-link {
+            margin: 0.5rem 0;
+        }
+}
